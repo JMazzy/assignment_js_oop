@@ -1,8 +1,20 @@
+* {
+  font-family: sans-serif;
+}
+
+h1 {
+  text-align: center;
+}
+
 canvas {
   border: 2px black solid;
 }
 
 .canvas-holder {
   padding: auto;
+  text-align: center;
+}
+
+.score-box {
   text-align: center;
 }

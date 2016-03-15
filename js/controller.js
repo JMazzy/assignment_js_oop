@@ -3,7 +3,8 @@ var GAME = GAME || {};
 
 GAME.width = 1600;
 GAME.height = 800;
-
+GAME.score = 0;
+GAME.playing = true;
 
 
 GAME.controller = {
@@ -16,20 +17,18 @@ GAME.controller = {
 
     GAME.view.init(); // draw asteroids
 
-    this.playing = true;
-
     setInterval( function() {
       GAME.controller.gameLoop();
     }, 1000 / 60 );
   },
 
   gameLoop: function() {
-    if (this.playing) {
+    if (GAME.playing) {
       GAME.asteroidModel.update(this.getLasers());
       GAME.laserModel.update();
       GAME.shipModel.update();
-      GAME.view.draw();
     }
+    GAME.view.draw();
   },
 
 

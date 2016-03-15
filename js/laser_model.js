@@ -14,7 +14,7 @@ GAME.laserModel = {
 
   shootLaser: function(ship) {
     var direction = ship.direction.horizontalAngleDeg();
-    var vector = new Victor(10,0);
+    var vector = new Victor(10 + ship.velocity.magnitude(), 0);
     var velocity = vector.rotateDeg(direction);
 
     this.laserBeams.push(new this.Laser(ship.xCoord, ship.yCoord, velocity));

@@ -5,6 +5,7 @@ GAME.asteroidModel = {
     this.generateAsteroids(numAsteroids);
     this.deltaTime = 0;
     this.lastAsteroidCreatedAt = 0;
+    this.astrToExplode = [];
   },
 
 
@@ -29,78 +30,86 @@ GAME.asteroidModel = {
   },
 
 
-  findAsteroidsToExplode: function(lasers) {
-    var astrToExplode = [];
-
+  collisions: function(lasers) {
     for (var i = 0; i < this.asteroids.length; i++) {
-
-      // check for asteroid collisions
-      for (var j = 0; j < this.asteroids.length; j++) {
-        if (i === j) {
-          continue;
-        }
-        var astrA = this.asteroids[i];
-        var astrB = this.asteroids[j];
-        var distance = Math.sqrt( Math.pow(astrA.xCoord - astrB.xCoord, 2) + Math.pow(astrA.yCoord - astrB.yCoord, 2) );
-        var sumRadii = astrA.size + astrB.size;
-
-        if (distance <= sumRadii) {
-          astrToExplode.push(astrA);
-          astrToExplode.push(astrB);
-        }
-      }
-
-      // check for laser collisions
-      for (var k = 0; k < lasers.length; k ++) {
-        var astr = this.asteroids[i]
-        var radius = astr.size;
-        var distance = Math.sqrt( Math.pow(astr.xCoord - lasers[k].xCoord, 2) + Math.pow(astr.yCoord - lasers[k].yCoord, 2) );
-
-        if (distance <= radius) {
-          // TODO: make sure it's not already there
-          astrToExplode.push(astr);
-        }
-      }
-
-      // check for ship collisions
-      var astr = this.asteroids[i];
-      var radius = astr.size + GAME.controller.ship.size / 2;
-      var distance = Math.sqrt( Math.pow(astr.xCoord - GAME.controller.ship.xCoord, 2) + Math.pow(astr.yCoord - GAME.controller.ship.yCoord, 2) );
-
-      if (distance <= radius) {
-        console.log("Game over :(");
-        GAME.controller.playing = false;
-      }
-
+      this.asteroidAsteroid(i);
+      this.asteroidLaser(i, lasers);
+      this.asteroidShip(i);
     }
-    return astrToExplode;
   },
 
 
+  asteroidAsteroid: function(i) {
+    // check for asteroid collisions
+    for (var j = 0; j < this.asteroids.length; j++) {
+      if (i === j) {
+        continue;
+      }
+      var astrA = this.asteroids[i];
+      var astrB = this.asteroids[j];
+      var distance = Math.sqrt( Math.pow(astrA.xCoord - astrB.xCoord, 2) + Math.pow(astrA.yCoord - astrB.yCoord, 2) );
+      var sumRadii = astrA.size + astrB.size;
 
-  explodeAsteroids: function(arr) {
-    // halve existing asteroid's size, randomize velocity
-    for (var i = 0; i < arr.length; i++) {
-      var collisionX = arr[i].xCoord;
-      var collisionY = arr[i].yCoord;
-      var originalSize = arr[i].size;
-      var leftVector = arr[i].velocity.clone().rotateDeg(-90);
-      var rightVector = arr[i].velocity.clone().rotateDeg(90);
+      if (distance <= sumRadii) {
+        this.addAstrToExplode( astrA );
+      }
+    }
+  },
 
-      var aIdx = this.asteroids.indexOf(arr[i]);
+  addAstrToExplode: function(astr) {
+    if ( !this.astrToExplode.indexOf(astr) || this.astrToExplode.indexOf(astr) === -1 ) {
+      this.astrToExplode.unshift(astr);
+    }
+  },
 
-      if (originalSize < 10) {
-        arr.splice(i,1);
-        this.asteroids.splice(aIdx, 1);
-      } else {
+  asteroidLaser: function(i, lasers) {
+    // check for laser collisions
+    for (var k = 0; k < lasers.length; k ++) {
+      var astr = this.asteroids[i]
+      var radius = astr.size;
+      var distance = Math.sqrt( Math.pow(astr.xCoord - lasers[k].xCoord, 2) + Math.pow(astr.yCoord - lasers[k].yCoord, 2) );
+
+      if (distance <= radius) {
+        // TODO: make sure it's not already there
+        lasers.splice(k, 1)
+        GAME.score += 1;
+        this.addAstrToExplode(astr);
+      }
+    }
+  },
+
+  asteroidShip: function(i) {
+    // check for ship collisions
+    var astr = this.asteroids[i];
+    var radius = astr.size + GAME.controller.ship.size / 2;
+    var distance = Math.sqrt( Math.pow(astr.xCoord - GAME.controller.ship.xCoord, 2) + Math.pow(astr.yCoord - GAME.controller.ship.yCoord, 2) );
+
+    if (distance <= radius) {
+      GAME.playing = false;
+    }
+  },
+
+
+  explodeAsteroids: function() {
+    while ( this.astrToExplode.length > 0 ) {
+      var astr = this.astrToExplode.pop();
+      var collisionX = astr.xCoord;
+      var collisionY = astr.yCoord;
+      var originalSize = astr.size;
+      var leftVector = astr.velocity.clone().rotateDeg(-60);
+      var rightVector = astr.velocity.clone().rotateDeg(60);
+
+      var aIdx = this.asteroids.indexOf(astr);
+
+      //remove asteroid
+      this.asteroids.splice(aIdx, 1);
+
+      if (originalSize >= 10) {
         var leftDisplace = (new Victor(originalSize, 0)).rotateDeg(leftVector.horizontalAngleDeg());
 
         var rightDisplace = (new Victor(originalSize, 0)).rotateDeg(rightVector.horizontalAngleDeg());
 
-        this.asteroids[aIdx].xCoord = collisionX + leftDisplace.x;
-        this.asteroids[aIdx].yCoord = collisionY + leftDisplace.y;
-        this.asteroids[aIdx].size = GAME.useful.halfSize(originalSize);
-        this.asteroids[aIdx].velocity = new Victor(leftVector.x, leftVector.y );
+        this.asteroids.push( new GAME.asteroidModel.Asteroid(collisionX + leftDisplace.x, collisionY + leftDisplace.y, originalSize/2, leftVector.x, leftVector.y));
 
         // create new tiny asteroid, with random velocity
         this.asteroids.push( new GAME.asteroidModel.Asteroid(collisionX + rightDisplace.x, collisionY + rightDisplace.y, originalSize/2, rightVector.x, rightVector.y));
@@ -114,7 +123,8 @@ GAME.asteroidModel = {
     for ( var i = 0; i < this.asteroids.length; i++ ) {
       this.asteroids[i].tic();
     }
-    this.explodeAsteroids(this.findAsteroidsToExplode(lasers));
+    this.collisions(lasers);
+    this.explodeAsteroids();
     this.addNewAsteroid();
   },
 

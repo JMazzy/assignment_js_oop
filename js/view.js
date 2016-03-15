@@ -21,6 +21,12 @@ GAME.view = {
     this.drawAsteroids();
     this.drawShip();
     this.drawLasers();
+
+    $( "#score" ).text(GAME.score);
+
+    if ( !GAME.playing ) {
+      $( "#game-over" ).text("Game Over :-( Click to play again!");
+    }
   },
 
   drawAsteroids: function() {
@@ -35,18 +41,27 @@ GAME.view = {
 
   drawShip: function() {
     var ship = GAME.controller.ship;
+    var center = { x: ship.xCoord, y: ship.yCoord };
+
     var victor = ship.direction.clone();
+    var nose = { x: ship.xCoord + victor.x, y: ship.yCoord + victor.y }
+
+    var rotated = victor.rotateDeg(150)
+    var backRight = { x: ship.xCoord + rotated.x, y: ship.yCoord + rotated.y }
+
+    var taters = rotated.rotateDeg(60)
+    var backLeft = { x: ship.xCoord + taters.x, y: ship.yCoord + taters.y }
 
     this.context.strokeStyle = '#fff';
     this.context.beginPath();
-    this.context.moveTo(ship.xCoord + victor.x, ship.yCoord + victor.y);
 
-    var rotated = victor.rotateDeg(90)
-    this.context.lineTo(ship.xCoord + rotated.x, ship.yCoord + rotated.y);
+    this.context.moveTo( center.x, center.y );
 
-    var taters = rotated.rotateDeg(180)
-    this.context.lineTo(ship.xCoord + taters.x, ship.yCoord + taters.y)
+    this.context.lineTo( backRight.x, backRight.y );
 
+    this.context.lineTo( nose.x, nose.y );
+
+    this.context.lineTo( backLeft.x, backLeft.y );
 
     this.context.closePath();
     this.context.stroke();
