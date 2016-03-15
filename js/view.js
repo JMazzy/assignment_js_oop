@@ -19,8 +19,8 @@ GAME.view = {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
     this.drawAsteroids();
-    this.drawShip();
     this.drawLasers();
+    this.drawShip();
 
     $( "#score" ).text(GAME.score);
 
@@ -32,10 +32,12 @@ GAME.view = {
   drawAsteroids: function() {
     $.each(GAME.controller.allAsteroids, function(i, astr) {
       GAME.view.context.beginPath();
-      GAME.view.context.strokeStyle = '#fff';
+      GAME.view.context.fillStyle = '#777';
+      GAME.view.context.strokeStyle = '#666';
       // arc(x, y, radius, angle, Math.PI * 2, false for clockwise/true for counter-clockwise)
       GAME.view.context.arc(astr.xCoord, astr.yCoord, astr.size, 0, Math.PI * 2, false)
       GAME.view.context.stroke();
+      GAME.view.context.fill();
     });
   },
 
@@ -52,7 +54,8 @@ GAME.view = {
     var taters = rotated.rotateDeg(60)
     var backLeft = { x: ship.xCoord + taters.x, y: ship.yCoord + taters.y }
 
-    this.context.strokeStyle = '#fff';
+    this.context.fillStyle = '#aaa';
+    this.context.strokeStyle = '#aaa';
     this.context.beginPath();
 
     this.context.moveTo( center.x, center.y );
@@ -65,6 +68,7 @@ GAME.view = {
 
     this.context.closePath();
     this.context.stroke();
+    this.context.fill()
   },
 
   drawLasers: function() {
@@ -72,13 +76,12 @@ GAME.view = {
       var vector = new Victor(laser.size, 0);
       var rotated = vector.rotateDeg(laser.velocity.horizontalAngleDeg())
 
-      GAME.view.context.strokeStyle = "#fff";
+      GAME.view.context.strokeStyle = "#55ee55";
       GAME.view.context.beginPath();
       GAME.view.context.moveTo(laser.xCoord, laser.yCoord);
       GAME.view.context.lineTo(rotated.x + laser.xCoord, rotated.y + laser.yCoord);
       GAME.view.context.closePath();
       GAME.view.context.stroke();
-
     })
   },
 

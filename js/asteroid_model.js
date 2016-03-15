@@ -104,7 +104,7 @@ GAME.asteroidModel = {
       //remove asteroid
       this.asteroids.splice(aIdx, 1);
 
-      if (originalSize >= 10) {
+      if (originalSize > 10) {
         var leftDisplace = (new Victor(originalSize, 0)).rotateDeg(leftVector.horizontalAngleDeg());
 
         var rightDisplace = (new Victor(originalSize, 0)).rotateDeg(rightVector.horizontalAngleDeg());
