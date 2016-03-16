@@ -1,7 +1,7 @@
 Time to play Asteroids!
 
-Josh + Julia
+Josh Masland
 
-HTML Preview: (https://htmlpreview.github.io/?https://github.com/cadyherron/assignment_js_oop/blob/master/index.html)
+Project page: masland-sarani.com/asteroids
 
 [A JavaScript project using objects, constructors and prototypes from the Viking Code School](http://www.vikingcodeschool.com)
