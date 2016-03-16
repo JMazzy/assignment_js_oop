@@ -33,11 +33,11 @@ GAME.view = {
     $.each(GAME.controller.allAsteroids, function(i, astr) {
       GAME.view.context.beginPath();
       GAME.view.context.fillStyle = '#777';
-      GAME.view.context.strokeStyle = '#666';
+      GAME.view.context.strokeStyle = GAME.view.randomColor();
       // arc(x, y, radius, angle, Math.PI * 2, false for clockwise/true for counter-clockwise)
       GAME.view.context.arc(astr.xCoord, astr.yCoord, astr.size, 0, Math.PI * 2, false)
-      GAME.view.context.stroke();
       GAME.view.context.fill();
+      GAME.view.context.stroke();
     });
   },
 
@@ -55,7 +55,7 @@ GAME.view = {
     var backLeft = { x: ship.xCoord + taters.x, y: ship.yCoord + taters.y }
 
     this.context.fillStyle = '#aaa';
-    this.context.strokeStyle = '#aaa';
+    this.context.strokeStyle = GAME.view.randomColor();;
     this.context.beginPath();
 
     this.context.moveTo( center.x, center.y );
@@ -67,8 +67,16 @@ GAME.view = {
     this.context.lineTo( backLeft.x, backLeft.y );
 
     this.context.closePath();
+
+    this.context.fill();
     this.context.stroke();
-    this.context.fill()
+  },
+
+  randomColor: function() {
+    var r = Math.floor( Math.random() * 128 + 64 );
+    var g = Math.floor( Math.random() * 128 + 64 );
+    var b = Math.floor( Math.random() * 128 + 64 );
+    return "rgb( " + r + "," + g + "," + b + " )";
   },
 
   drawLasers: function() {
@@ -76,7 +84,7 @@ GAME.view = {
       var vector = new Victor(laser.size, 0);
       var rotated = vector.rotateDeg(laser.velocity.horizontalAngleDeg())
 
-      GAME.view.context.strokeStyle = "#55ee55";
+      GAME.view.context.strokeStyle = GAME.view.randomColor();
       GAME.view.context.beginPath();
       GAME.view.context.moveTo(laser.xCoord, laser.yCoord);
       GAME.view.context.lineTo(rotated.x + laser.xCoord, rotated.y + laser.yCoord);

@@ -55,12 +55,14 @@ GAME.asteroidModel = {
       }
     }
   },
+  
 
   addAstrToExplode: function(astr) {
     if ( !this.astrToExplode.indexOf(astr) || this.astrToExplode.indexOf(astr) === -1 ) {
       this.astrToExplode.unshift(astr);
     }
   },
+
 
   asteroidLaser: function(i, lasers) {
     // check for laser collisions
@@ -77,6 +79,7 @@ GAME.asteroidModel = {
       }
     }
   },
+
 
   asteroidShip: function(i) {
     // check for ship collisions
